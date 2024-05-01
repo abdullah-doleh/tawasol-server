@@ -32,11 +32,10 @@ const crypto = require("crypto");
 
 const app = express();
 
-// Generate a random nonce value
-const nonce = crypto.randomBytes(16).toString('base64');
 
 // Set Content Security Policy (CSP) header with nonce
 app.use((req, res, next) => {
+    const nonce = crypto.randomBytes(16).toString('base64');
     res.setHeader('Content-Security-Policy', `default-src 'self'; script-src 'self' 'nonce-${nonce}'`);
     next();
 });
