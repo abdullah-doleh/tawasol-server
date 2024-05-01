@@ -9,9 +9,10 @@ const auth = (req, res, next) => {
         return res.status(401).json({ msg: "Token is not available, authentication denied" });
     }
     try {
-        res.setHeader('Content-Security-Policy', "default-src 'self'; connect-src 'self' https://tawasol-server-8ea12eeff4fd.herokuapp.com");
+        
         const decoded = jwt.verify(token, config.get("jwtSecret"));
         req.user = decoded.user;
+        res.setHeader('Content-Security-Policy', "default-src 'self'; connect-src 'self' https://tawasol-server-8ea12eeff4fd.herokuapp.com");
         next(); // Call next middleware
     } catch (err) {
         console.error(err.message);
