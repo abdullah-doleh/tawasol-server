@@ -29,7 +29,8 @@ const cors = require("cors");
 const express = require("express");
 const connectDB = require("./config/db");
 const crypto = require("crypto");
-const bodyParser = require("body-parser"); // Import bodyParser
+const bodyParser = require("body-parser");
+const helmet = require("helmet"); // Import helmet package
 
 const app = express(); // Declare app here
 
