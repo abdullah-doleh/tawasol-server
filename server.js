@@ -3,6 +3,16 @@ const express = require("express");
 const connectDB = require("./config/db");
 
 const app = express();
+const helmet = require('helmet');
+
+
+// Use helmet middleware to set Content-Security-Policy header
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    imgSrc: ["'self'", "data:"]
+  }
+}));
 
 app.use(express.json());//convert to json body pareser
 app.use(cors());//to allow access from outside the server
