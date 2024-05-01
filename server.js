@@ -30,12 +30,18 @@ const express = require("express");
 const connectDB = require("./config/db");
 const crypto = require("crypto");
 
+// Generate the SHA-256 hash
+const hash = crypto.createHash('sha256').update(inlineScriptContent).digest('base64');
+console.log(`Inline script hash: ${hash}`);
+
 const app = express();
 
+const inlineScriptContent = "console.log('Your inline script content here');";
+const inlineScriptHash = `'sha256-${crypto.createHash('sha256').update(inlineScriptContent).digest('base64')}'`;
 
 // Set Content Security Policy (CSP) header with nonce
 app.use((req, res, next) => {
-    const nonce = crypto.randomBytes(16).toString('base64');
+   // const nonce = crypto.randomBytes(16).toString('base64');
     res.setHeader('Content-Security-Policy', `default-src 'self'; script-src 'self' 'nonce-${nonce}'`);
     next();
 });
