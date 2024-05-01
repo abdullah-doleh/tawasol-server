@@ -51,7 +51,7 @@ connectDB();
 app.use(express.static(__dirname + '/public'));
 
 app.get("/", (req, res) =>
-    res.send("server is working")
+    res.send("Server is working")
 );
 
 const PORT = process.env.PORT || 5000;
