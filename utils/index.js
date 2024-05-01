@@ -1,6 +1,7 @@
 const multer = require("multer");
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const nonce = generateNonce() // Generate a unique nonce value
 
 const auth = (req, res, next) => {
     // Get token from the request header
@@ -9,6 +10,8 @@ const auth = (req, res, next) => {
         return res.status(401).json({ msg: "Token is not available, authentication denied" });
     }
     try {
+        const nonce = generateNonce(); // Generate a unique nonce value
+        res.setHeader('Content-Security-Policy', `default-src 'none'; script-src 'nonce-${nonce}'`);
         const decoded = jwt.verify(token, config.get("jwtSecret"));
         req.user = decoded.user;
         next(); // Call next middleware
