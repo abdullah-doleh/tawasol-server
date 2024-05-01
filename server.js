@@ -29,7 +29,12 @@ const cors = require("cors");
 const express = require("express");
 const connectDB = require("./config/db");
 const crypto = require("crypto");
+const bodyParser = require("body-parser"); // Import bodyParser
+
+const app = express(); // Declare app here
+
 app.use(bodyParser.urlencoded({ extended: false }));
+
 // Generate a unique nonce value for each request
 const generateNonce = () => {
     return crypto.randomBytes(16).toString('base64');
@@ -41,6 +46,7 @@ app.use((req, res, next) => {
     res.locals.nonce = nonce;
     next();
 });
+
 const inlineScript = "console.log('Hello, world!');";
 
 // Generate the SHA-256 hash of the inline script
@@ -48,7 +54,6 @@ const hash = crypto.createHash('sha256').update(inlineScript).digest('base64');
 
 // Construct the CSP meta tag with the generated hash
 const cspMetaTag = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-${hash}'">`;
-
 
 app.use((req, res, next) => {
     res.setHeader(
@@ -68,13 +73,8 @@ app.use(helmet.contentSecurityPolicy({
 
 console.log(`Inline script hash: ${hash}`);
 
-const app = express();
-
 const inlineScriptContent = "console.log('Your inline script content here');";
 const inlineScriptHash = `'sha256-${crypto.createHash('sha256').update(inlineScriptContent).digest('base64')}'`;
-
-// Set Content Security Policy (CSP) header with nonce
-
 
 app.use(express.json()); // Convert to JSON body parser
 app.use(cors()); // Allow access from outside the server
