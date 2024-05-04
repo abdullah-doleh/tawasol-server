@@ -1,38 +1,44 @@
 const cors = require("cors");
 const express = require("express");
+const helmet = require("helmet");
 const connectDB = require("./config/db");
 
 const app = express();
 
+// Middleware setup
+app.use(express.json()); // JSON body parser
+app.use(cors()); // CORS middleware
+app.use(helmet()); // Helmet middleware for general security headers
 
-app.use(express.json());//convert to json body pareser
-app.use(cors());//to allow access from outside the server
-app.use("/api/users",require("./routes/users"));
-app.use("/api/profiles",require("./routes/profiles"));
-const helmet = require("helmet");
-app.use("/api/posts",require("./routes/posts"));
+// Content Security Policy (CSP) setup
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'none'"],
+      scriptSrc: ["'self'"], // Allow only scripts from the same origin
+      // Add more directives as needed
+    },
+  })
+);
 
-  
+// Routes setup
+app.use("/api/users", require("./routes/users"));
+app.use("/api/profiles", require("./routes/profiles"));
+app.use("/api/posts", require("./routes/posts"));
+
+// Database connection
 connectDB();
 
-app.use(express.static(__dirname+'/public'))
+// Static files
+app.use(express.static(__dirname + "/public"));
 
-app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-          defaultSrc: ["'none'"],
-          scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts
-          // Add more directives as needed
-        },
-      }))
-  
+// Default route
+app.get("/", (req, res) => {
+  res.send("Server is working");
+});
 
-
-app.get("/",(req,res)=>
-    res.send("server is working"));
-
-const PORT =process.env.PORT || 5000;
-
-app.listen(PORT,()=>{
-    console.log(`server has started on port ${PORT}`)
+// Start the server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server has started on port ${PORT}`);
 });
