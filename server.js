@@ -14,8 +14,8 @@ app.use(helmet()); // Helmet middleware for general security headers
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'none'"],
-      scriptSrc: ["'self'"], // Allow only scripts from the same origin
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'","'unsafe-inline'"], // Allow only scripts from the same origin
       // Add more directives as needed
     },
   })
