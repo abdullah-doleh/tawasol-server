@@ -19,13 +19,14 @@ app.use(express.static(__dirname+'/public'))
 
 app.use(
     helmet.contentSecurityPolicy({
-      directives: {
-        defaultSrc: ["'self'"], // Allow resources from the same origin
-        scriptSrc: ["'self'"], // Allow scripts from the same origin
-        // Add more directives as needed
-      },
-    })
-  );
+        directives: {
+          defaultSrc: ["'none'"],
+          scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts
+          // Add more directives as needed
+        },
+      }))
+  
+
 
 app.get("/",(req,res)=>
     res.send("server is working"));
