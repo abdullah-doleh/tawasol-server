@@ -1,7 +1,9 @@
 const cors = require("cors");
 const express = require("express");
-const helmet = require("helmet");
 const connectDB = require("./config/db");
+const bodyParser = require("body-parser");
+const helmet = require('helmet');
+const crypto = require('crypto'); // Import crypto module once
 
 const app = express();
 
@@ -9,17 +11,29 @@ const app = express();
 app.use(express.json()); // JSON body parser
 app.use(cors()); // CORS middleware
 app.use(helmet()); // Helmet middleware for general security headers
+app.use(bodyParser.json()); // json is format of the file 
+
+app.use(bodyParser.urlencoded({ extended: false }));
+// Generate a unique nonce value for each request
+const generateNonce = () => {
+    return crypto.randomBytes(16).toString('base64');
+};
+
+// Generate nonce for the current request
+const nonce = generateNonce();
+app.use((req, res, next) => {
+    res.locals.nonce = nonce;
+    next();
+});
+const inlineScript = "console.log('Hello, world!');";
+
+// Generate the SHA-256 hash of the inline script
+const hash = crypto.createHash('sha256').update(inlineScript).digest('base64');
+
+// Construct the CSP meta tag with the generated hash
+const cspMetaTag = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-${hash}'">`;
 
 // Content Security Policy (CSP) setup
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'none'"],
-      scriptSrc: ["'none'"], // Allow only scripts from the same origin
-      // Add more directives as needed
-    },
-  })
-);
 
 // Routes setup
 app.use("/api/users", require("./routes/users"));
