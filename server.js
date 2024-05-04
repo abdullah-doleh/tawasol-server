@@ -2,8 +2,9 @@ const cors = require("cors");
 const express = require("express");
 const helmet = require("helmet");
 const connectDB = require("./config/db");
-
+const crypto = require('crypto');
 const app = express();
+const nonce = crypto.randomBytes(16).toString('base64');
 
 // Middleware setup
 app.use(express.json()); // JSON body parser
@@ -12,14 +13,16 @@ app.use(helmet()); // Helmet middleware for general security headers
 
 // Content Security Policy (CSP) setup
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'","'unsafe-inline'"], // Allow only scripts from the same origin
-      // Add more directives as needed
-    },
-  })
-);
+    helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'none'"], // Default source to none
+        scriptSrc: ["'self'"], // Allow scripts from the same origin
+        // Add the nonce value to the script-src directive
+        scriptSrc: ["'self'", `'nonce-${nonce}'`],
+        // Add more directives as needed
+      },
+    })
+  );
 
 // Routes setup
 app.use("/api/users", require("./routes/users"));
