@@ -3,25 +3,29 @@ const express = require("express");
 const connectDB = require("./config/db");
 
 const app = express();
-const helmet = require('helmet');
+
 
 app.use(express.json());//convert to json body pareser
 app.use(cors());//to allow access from outside the server
 app.use("/api/users",require("./routes/users"));
 app.use("/api/profiles",require("./routes/profiles"));
-app.use(helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'none'"],
-      scriptSrc: ["'self'", "'sha256-gPjlli1HEdLlR0AZTY971/wQVOdSkl9mEinLnxrPpJw='"]
-      // Add other directives as needed
-    }
-  }));
+const helmet = require("helmet");
 app.use("/api/posts",require("./routes/posts"));
 
   
 connectDB();
 
 app.use(express.static(__dirname+'/public'))
+
+app.use(
+    helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'self'"], // Allow resources from the same origin
+        scriptSrc: ["'self'"], // Allow scripts from the same origin
+        // Add more directives as needed
+      },
+    })
+  );
 
 app.get("/",(req,res)=>
     res.send("server is working"));
