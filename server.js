@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 // Construct Content Security Policy (CSP) meta tag with nonce
 const cspMetaTag = (req, res, next) => {
     const nonce = res.locals.nonce;
-    res.setHeader('Content-Security-Policy', `default-src 'self'; script-src 'self' 'nonce-${nonce}' 'unsafe-inline'`);
+    res.setHeader('Content-Security-Policy', `default-src 'self'; script-src 'self' 'nonce-${nonce}' 'safe-inline'`);
     next();
 };
 
