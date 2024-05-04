@@ -14,31 +14,31 @@ app.use(helmet()); // Helmet middleware for general security headers
 app.use(bodyParser.json()); // json is format of the file 
 
 app.use(bodyParser.urlencoded({ extended: false }));
-// Generate a unique nonce value for each request
-const generateNonce = () => {
-    return crypto.randomBytes(16).toString('base64');
-};
 
-// Generate nonce for the current request
-const nonce = generateNonce();
+// Middleware to generate a unique nonce value for each request
 app.use((req, res, next) => {
+    // Generate nonce for the current request
+    const nonce = crypto.randomBytes(16).toString('base64');
+    // Set nonce in locals to access it in routes
     res.locals.nonce = nonce;
+    // Call next middleware
     next();
 });
-const inlineScript = "console.log('Hello, world!');";
 
-// Generate the SHA-256 hash of the inline script
-const hash = crypto.createHash('sha256').update(inlineScript).digest('base64');
-
-// Construct the CSP meta tag with the generated hash
-const cspMetaTag = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-${hash}'">`;
-
-// Content Security Policy (CSP) setup
+// Construct Content Security Policy (CSP) meta tag with nonce
+const cspMetaTag = (req, res, next) => {
+    // Get nonce from locals
+    const nonce = res.locals.nonce;
+    // Construct CSP header with the nonce
+    res.setHeader('Content-Security-Policy', `default-src 'none'; script-src 'self' 'nonce-${nonce}'`);
+    // Call next middleware
+    next();
+};
 
 // Routes setup
-app.use("/api/users", require("./routes/users"));
-app.use("/api/profiles", require("./routes/profiles"));
-app.use("/api/posts", require("./routes/posts"));
+app.use("/api/users", cspMetaTag, require("./routes/users"));
+app.use("/api/profiles", cspMetaTag, require("./routes/profiles"));
+app.use("/api/posts", cspMetaTag, require("./routes/posts"));
 
 // Database connection
 connectDB();
