@@ -8,6 +8,18 @@ const app = express();
 // Middleware setup
 app.use(express.json()); // JSON body parser
 app.use(cors()); // CORS middleware
+app.use(helmet()); // Helmet middleware for general security headers
+
+// Content Security Policy (CSP) setup
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'none'"],
+      scriptSrc: ["'none'"], // Allow only scripts from the same origin
+      // Add more directives as needed
+    },
+  })
+);
 
 // Routes setup
 app.use("/api/users", require("./routes/users"));
