@@ -17,7 +17,7 @@
 // }
 // module.exports = connectDB; 
 const mongoose = require("mongoose");
-
+ 
 require('dotenv').config(); // Load environment variables from .env file
 
 const db = process.env.MONGO_CONNECTION_STRING;
